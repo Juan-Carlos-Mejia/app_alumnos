@@ -116,7 +116,7 @@ Vue.component('componente-registros', {
         <div class="row">
             <div class="col col-md-6">
                 <div class="card">
-                    <div class="card-header text-bg-dark">REGISTRO DE REGISTROS</div>
+                    <div class="card-header text-bg-dark">REGISTRO DE INSCRIPCIONES</div>
                     <div class="catd-body">
                         <div class="row p-1">
                             <div class="col col-md-2">materia</div>
