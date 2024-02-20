@@ -63,11 +63,17 @@ Vue.component('componente-registros', {
                 console.error('Error al guardar en registros', e.message());
             };
         },
-        alumnoExiste(idAlumno){
-            // Aquí puedes implementar la lógica para verificar si el alumno con el ID proporcionado existe en la base de datos
-            // Puedes realizar una consulta a la base de datos para comprobar la existencia del alumno
-            // Devuelve true si el alumno existe, false en caso contrario
-            return true; // Ejemplo: siempre retorna true por simplicidad, debes implementar la lógica real
+       alumnoExiste(idAlumno) {
+            // Simulación de una lista de IDs de alumnos existentes en la base de datos
+            const alumnosExistentes = ['1', '2', '3', '4', '5'];
+        
+            // Verificar si el ID del alumno está en la lista de alumnos existentes
+            if (alumnosExistentes.includes(idAlumno)) {
+                return true; // El alumno existe en la base de datos
+            } else {
+                return false; // El alumno no existe en la base de datos
+            }
+       
         },
         nuevoregistro(){
             this.accion = 'nuevo';
