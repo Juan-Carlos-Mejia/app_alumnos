@@ -63,7 +63,7 @@ Vue.component('componente-materias', {
         <div class="row">
             <div class="col col-md-6">
                 <div class="card text-bg-dark">
-                    <div class="card-header">REGISTRO DE MATERIAS</div>
+                    <div class="card-header">¡REGISTRO DE MATERIAS!</div>
                     <div class="catd-body">
                         <div class="row p-1">
                             <div class="col col-md-2">CODIGO</div>
