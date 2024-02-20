@@ -40,12 +40,19 @@ Vue.component('componente-registros', {
             this.registro = registro;
         },
         guardarregistro(){
-            //almacenamiento del objeto registros en indexedDB
-            if( this.registro.materia.id=='' ||
-                this.registro.materia.label=='' ){
+            // Validar si la materia ha sido seleccionada
+            if(this.registro.materia.id === '' || this.registro.materia.label === ''){
                 console.error("Por favor seleccione una materia");
                 return;
             }
+        
+            // Validar si el alumno ya está registrado
+            if(!this.alumnoExiste(this.registro.materia.id)){
+                console.error("El alumno seleccionado no existe en la base de datos");
+                return;
+            }
+        
+            // Almacenar el registro en la base de datos
             let store = abrirStore('registros', 'readwrite'),
                 query = store.put({...this.registro});
             query.onsuccess = e=>{
@@ -55,6 +62,12 @@ Vue.component('componente-registros', {
             query.onerror = e=>{
                 console.error('Error al guardar en registros', e.message());
             };
+        },
+        alumnoExiste(idAlumno){
+            // Aquí puedes implementar la lógica para verificar si el alumno con el ID proporcionado existe en la base de datos
+            // Puedes realizar una consulta a la base de datos para comprobar la existencia del alumno
+            // Devuelve true si el alumno existe, false en caso contrario
+            return true; // Ejemplo: siempre retorna true por simplicidad, debes implementar la lógica real
         },
         nuevoregistro(){
             this.accion = 'nuevo';
