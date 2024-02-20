@@ -88,7 +88,7 @@ Vue.component('componente-materias', {
             </div>
             <div class="col col-md-6">
                 <div class="card text-bg-dark">
-                    <div class="card-header">LISTADO DE MATERIAS</div>
+                    <div class="card-header">¡LISTADO DE MATERIAS!</div>
                     <div class="card-body">
                         <form id="frmmateria">
                             <table class="table table-dark table-hover">
