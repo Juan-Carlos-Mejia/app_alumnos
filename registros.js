@@ -26,7 +26,7 @@ Vue.component('componente-registros', {
             this.listar();
         },
         eliminarregistro(idregistro){
-            if( confirm(`Esta seguro de elimina el registro?`) ){
+            if( confirm(`¿Está seguro de eliminar el registro?`) ){
                 let store = abrirStore('registros', 'readwrite'),
                 query = store.delete(idregistro);
             query.onsuccess = e=>{
@@ -119,7 +119,7 @@ Vue.component('componente-registros', {
                     <div class="card-header text-bg-dark">REGISTRO DE INSCRIPCIONES</div>
                     <div class="catd-body">
                         <div class="row p-1">
-                            <div class="col col-md-2">materia</div>
+                            <div class="col col-md-2">MATERIA</div>
                             <div class="col col-md-3">
                                 <v-select-materia required v-model="registro.materia" 
                                     :options="materias">Por favor seleccione una materia</v-select-materia>
@@ -150,7 +150,7 @@ Vue.component('componente-registros', {
                             </div>
                         </div>
                         <div class="row p-1">
-                            <div class="col col-md-2">PRECIO</div>
+                            <div class="col col-md-2">CUOTA</div>
                             <div class="col col-md-3">
                                 <input v-model="registro.precio" type="number" class="form-control">
                             </div>
@@ -186,16 +186,16 @@ Vue.component('componente-registros', {
                                     <tr>
                                         <th>BUSCAR</th>
                                         <th colspan="6">
-                                            <input placeholder="codigo, nombre, sede, modalidad" type="search" v-model="valor" @keyup="buscarregistro" class="form-control">
+                                            <input placeholder="codigo, nombre, sede, modalidad, cuota" type="search" v-model="valor" @keyup="buscarregistro" class="form-control">
                                         </th>
                                     </tr>
                                     <tr>
-                                        <th>materia</th>
+                                        <th>MATERIA</th>
                                         <th>CODIGO</th>
                                         <th>NOMBRE</th>
                                         <th>SEDE</th>
                                         <th>MODALIDAD</th>
-                                        <th>PRECIO</th>
+                                        <th>CUOTA</th>
                                         <th></th>
                                     </tr>
                                 </thead>
