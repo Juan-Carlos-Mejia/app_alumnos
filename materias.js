@@ -15,31 +15,27 @@ Vue.component('componente-materias', {
         buscarmateria(e){
             this.listar();
         },
-        eliminarmateria(idmateria){
+        async eliminarmateria(idmateria){
             if( confirm(`Esta seguro de elimina el materia?`) ){
-                let store = abrirStore('materias', 'readwrite'),
-                query = store.delete(idmateria);
-            query.onsuccess = e=>{
+                this.accion='eliminar';
+                await db.materias.where("idmateria").equals(idmateria).delete();
+                let respuesta = await fetch(`private/modulos/materias/materias.php?accion=eliminar&materias=${JSON.stringify(this.materia)}`),
+                    data = await respuesta.json();
                 this.nuevomateria();
                 this.listar();
-            };
             }
         },
         modificarmateria(materia){
             this.accion = 'modificar';
             this.materia = materia;
         },
-        guardarmateria(){
+        async guardarmateria(){
             //almacenamiento del objeto materias en indexedDB
-            let store = abrirStore('materias', 'readwrite'),
-                query = store.put({...this.materia});
-            query.onsuccess = e=>{
-                this.nuevomateria();
-                this.listar();
-            };
-            query.onerror = e=>{
-                console.error('Error al guardar en materias', e.message());
-            };
+            await db.materias.bulkPut([{...this.materia}]);
+            let respuesta = await fetch(`private/modulos/materias/materias.php?accion=${this.accion}&materias=${JSON.stringify(this.materia)}`),
+                data = await respuesta.json();
+            this.nuevomateria();
+            this.listar();
         },
         nuevomateria(){
             this.accion = 'nuevo';
@@ -49,22 +45,25 @@ Vue.component('componente-materias', {
                 nombre:'',
             }
         },
-        listar(){
-            let store = abrirStore('materias', 'readonly'),
-                data = store.getAll();
-            data.onsuccess = resp=>{
-                this.materias = data.result
-                    .filter(materia=>materia.codigo.includes(this.valor) || 
-                    materia.nombre.toLowerCase().includes(this.valor.toLowerCase()));
-            };
+        async listar(){
+            let collections = db.materias.orderBy('codigo')
+            .filter(materia=>materia.codigo.includes(this.valor) ||
+                materia.nombre.toLowerCase().includes(this.valor.toLowerCase()));
+            this.materias = await collections.toArray();
+            if( this.materias.length<=0 ){
+                let respuesta = await fetch('private/modulos/materias/materias.php?accion=consultar'),
+                    data = await respuesta.json();
+                this.materias = data;
+                db.materias.bulkPut(data);
+            }
         }
     },
     template: `
         <div class="row">
             <div class="col col-md-6">
                 <div class="card text-bg-dark">
-                    <div class="card-header">¡REGISTRO DE MATERIAS!</div>
-                    <div class="catd-body">
+                    <div class="card-header">REGISTRO DE MATERIAS</div>
+                    <div class="card-body">
                         <div class="row p-1">
                             <div class="col col-md-2">CODIGO</div>
                             <div class="col col-md-3">
@@ -88,7 +87,7 @@ Vue.component('componente-materias', {
             </div>
             <div class="col col-md-6">
                 <div class="card text-bg-dark">
-                    <div class="card-header">¡LISTADO DE MATERIAS!</div>
+                    <div class="card-header">LISTADO DE MATERIAS</div>
                     <div class="card-body">
                         <form id="frmmateria">
                             <table class="table table-dark table-hover">
