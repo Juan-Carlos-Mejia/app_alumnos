@@ -2,7 +2,7 @@ var app = new Vue({
     el: '#app',
     data:{
         forms:{
-            registro:{mostrar:false},
+            inscripcion:{mostrar:false},
             materia:{mostrar:false},
             alumno:{mostrar:false},
         }
@@ -20,7 +20,7 @@ async function seleccionarFoto(imagen){
         let blob = await img(archivo, 1),
             reader = new FileReader();
         reader.onload = e=>{
-            app.$refs.registro.registro.foto=e.target.result;
+            app.$refs.inscripcion.inscripcion.foto=e.target.result;
         };
         reader.readAsDataURL(blob);
     }

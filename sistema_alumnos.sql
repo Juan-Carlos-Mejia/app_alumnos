@@ -61,7 +61,7 @@ CREATE TABLE `registros` (
   `nombre` varchar(100) DEFAULT NULL,
   `sede` varchar(100) DEFAULT NULL,
   `modalidad` varchar(100) DEFAULT NULL,
-  `precio` decimal(10,2) DEFAULT NULL,
+  `cuota` decimal(10,2) DEFAULT NULL,
   `foto` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

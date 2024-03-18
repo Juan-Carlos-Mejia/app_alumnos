@@ -40,8 +40,8 @@ class registros{
         if( empty($this->datos['modalidad']) ){
             $this->respuesta['msg'] = 'Por favor ingrese la modalidad del registro';
         }
-        if( empty($this->datos['precio']) ){
-            $this->respuesta['msg'] = 'Por favor ingrese el precio del registro';
+        if( empty($this->datos['cuota']) ){
+            $this->respuesta['msg'] = 'Por favor ingrese el cuota del registro';
         }
         return $this->administrar_registros();
     }
@@ -51,18 +51,18 @@ class registros{
             if( $accion==='nuevo' ){
                 return $this->db->consultas('INSERT INTO registros VALUES(?,?,?,?,?,?,?,?)',
                 $this->datos['idregistro'],$this->datos['materia']['id'],$this->datos['codigo'],
-                    $this->datos['nombre'],$this->datos['sede'],$this->datos['modalidad'],$this->datos['precio'],$this->datos['foto']);
+                    $this->datos['nombre'],$this->datos['sede'],$this->datos['modalidad'],$this->datos['cuota'],$this->datos['foto']);
             }else if($accion==='modificar' ){
-                return $this->db->consultas('UPDATE registros SET idmateria=?, codigo=?, nombre=?, sede=?, modalidad=?, precio=?, foto=? WHERE idregistro=?',
+                return $this->db->consultas('UPDATE registros SET idmateria=?, codigo=?, nombre=?, sede=?, modalidad=?, cuota=?, foto=? WHERE idregistro=?',
                 $this->datos['materia']['id'], $this->datos['codigo'],$this->datos['nombre'], $this->datos['sede'], $this->datos['modalidad'], 
-                $this->datos['precio'], $this->datos['foto'], $this->datos['idregistro']);
+                $this->datos['cuota'], $this->datos['foto'], $this->datos['idregistro']);
             }else if($accion==='eliminar'){
                 return $this->db->consultas('DELETE registros FROM registros WHERE idregistro=?',
                 $this->datos['idregistro']);
             }else if($accion==='consultar'){
                 $this->db->consultas('
                     SELECT registros.idregistro, registros.idmateria, registros.codigo, registros.nombre, 
-                        registros.sede, registros.modalidad, registros.precio, registros.foto, materias.nombre AS nomcat
+                        registros.sede, registros.modalidad, registros.cuota, registros.foto, materias.nombre AS nomcat
                     FROM registros
                         INNER JOIN materias ON (registros.idmateria = materias.idmateria)
                 ');

@@ -1,79 +1,79 @@
 Vue.component('v-select-materia', VueSelect.VueSelect);
-Vue.component('componente-registros', {
+Vue.component('componente-inscripciones', {
     data() {
         return {
             valor:'',
-            registros:[],
+            inscripciones:[],
             materias:[],
             accion:'nuevo',
-            registro:{
+            inscripcion:{
                 materia:{
                     id:'',
                     label:''
                 },
-                idregistro: new Date().getTime(),
+                idProducto: new Date().getTime(),
                 codigo:'',
                 nombre:'',
-                sede:'',
+                marca:'',
                 modalidad:'',
-                precio:0.0,
+                cuota:0.0,
                 foto:'',
             }
         }
     },
     methods:{
-        buscarregistro(e){
+        buscarProducto(e){
             this.listar();
         },
-        async eliminarregistro(idregistro){
-            if( confirm(`Esta seguro de elimina el registro?`) ){
-                await db.registros.where("idregistro").equals(idregistro).delete();
-                this.registro.foto = '';
-                let respuesta = await fetch(`private/modulos/registros/registros.php?accion=eliminar&registros=${JSON.stringify(this.registro)}`),
+        async eliminarProducto(idProducto){
+            if( confirm(`Esta seguro de elimina el inscripcion?`) ){
+                await db.inscripciones.where("idProducto").equals(idProducto).delete();
+                this.inscripcion.foto = '';
+                let respuesta = await fetch(`private/modulos/inscripciones/inscripciones.php?accion=eliminar&inscripciones=${JSON.stringify(this.inscripcion)}`),
                     data = await respuesta.json();
-                this.nuevoregistro();
+                this.nuevoProducto();
                 this.listar();
             }
         },
-        modificarregistro(registro){
+        modificarProducto(inscripcion){
             this.accion = 'modificar';
-            this.registro = registro;
+            this.inscripcion = inscripcion;
         },
-        async guardarregistro(){
-            //almacenamiento del objeto registros en indexedDB
-            if( this.registro.materia.id=='' ||
-                this.registro.materia.label=='' ){
+        async guardarProducto(){
+            //almacenamiento del objeto inscripciones en indexedDB
+            if( this.inscripcion.materia.id=='' ||
+                this.inscripcion.materia.label=='' ){
                 console.error("Por favor seleccione una materia");
                 return;
             }
-            await db.registros.bulkPut([{...this.registro}]);
-            let respuesta = await fetch(`private/modulos/registros/registros.php?accion=${this.accion}&registros=${JSON.stringify(this.registro)}`),
+            await db.inscripciones.bulkPut([{...this.inscripcion}]);
+            let respuesta = await fetch(`private/modulos/inscripciones/inscripciones.php?accion=${this.accion}&inscripciones=${JSON.stringify(this.inscripcion)}`),
                 data = await respuesta.json();
-            this.nuevoregistro();
+            this.nuevoProducto();
             this.listar();
             
             /*query.onerror = e=>{
-                console.error('Error al guardar en registros', e);
+                console.error('Error al guardar en inscripciones', e);
                 if( e.target.error.message.includes('uniqueness') ){
-                    alertify.error(`Error al guardar en registros, codigo ${this.registro.codigo} ya existe`);
+                    alertify.error(`Error al guardar en inscripciones, codigo ${this.inscripcion.codigo} ya existe`);
                     return;
                 }
-                alertify.error(`Error al guardar en registros, ${e.target.error.message}`);
+                alertify.error(`Error al guardar en inscripciones, ${e.target.error.message}`);
             };*/
         },
-        nuevoregistro(){
+        nuevoProducto(){
             this.accion = 'nuevo';
-            this.registro = {
+            this.inscripcion = {
                 materia:{
                     id:'',
                     label:''
                 },
-                idregistro: new Date().getTime(),
+                idProducto: new Date().getTime(),
                 codigo:'',
                 nombre:'',
-                sede:'',
+                marca:'',
                 modalidad:'',
-                precio:0.0
+                cuota:0.0
             }
         },
         async listar(){
@@ -85,32 +85,32 @@ Vue.component('componente-registros', {
                     label:materia.nombre
                 }
             });
-            let collection = db.registros.orderBy('codigo').filter(
-                registro=>registro.codigo.includes(this.valor) || 
-                    registro.nombre.toLowerCase().includes(this.valor.toLowerCase()) || 
-                    registro.sede.toLowerCase().includes(this.valor.toLowerCase()) || 
-                    registro.modalidad.toLowerCase().includes(this.valor.toLowerCase())
+            let collection = db.inscripciones.orderBy('codigo').filter(
+                inscripcion=>inscripcion.codigo.includes(this.valor) || 
+                    inscripcion.nombre.toLowerCase().includes(this.valor.toLowerCase()) || 
+                    inscripcion.marca.toLowerCase().includes(this.valor.toLowerCase()) || 
+                    inscripcion.modalidad.toLowerCase().includes(this.valor.toLowerCase())
             );
-            this.registros = await collection.toArray();
-            if( this.registros.length<=0 ){
-                let respuesta = await fetch('private/modulos/registros/registros.php?accion=consultar'),
+            this.inscripciones = await collection.toArray();
+            if( this.inscripciones.length<=0 ){
+                let respuesta = await fetch('private/modulos/inscripciones/inscripciones.php?accion=consultar'),
                     data = await respuesta.json();
-                this.registros = data.map(registro=>{
+                this.inscripciones = data.map(inscripcion=>{
                     return {
                         materia:{
-                            id:registro.idmateria,
-                            label:registro.nomcat
+                            id:inscripcion.idmateria,
+                            label:inscripcion.nomcat
                         }, 
-                        idregistro : registro.idregistro,
-                        codigo: registro.codigo,
-                        nombre: registro.nombre,
-                        sede: registro.sede,
-                        modalidad: registro.modalidad,
-                        precio: registro.precio,
-                        foto:registro.foto.split(' ').join('+')
+                        idProducto : inscripcion.idProducto,
+                        codigo: inscripcion.codigo,
+                        nombre: inscripcion.nombre,
+                        marca: inscripcion.marca,
+                        modalidad: inscripcion.modalidad,
+                        cuota: inscripcion.cuota,
+                        foto:inscripcion.foto.split(' ').join('+')
                     }
                 });
-                db.registros.bulkPut(this.registros);
+                db.inscripciones.bulkPut(this.inscripciones);
             }
         }
     },
@@ -118,49 +118,49 @@ Vue.component('componente-registros', {
         <div class="row">
             <div class="col col-md-5">
                 <div class="card">
-                    <div class="card-header text-bg-dark">REGISTRO DE MATRICULAS</div>
+                    <div class="card-header text-bg-dark">REGISTRO DE inscripciones</div>
                     <div class="catd-body">
-                        <form id="frmregistro" @reset.prevent.default="nuevoProduto" @submit.prevent.default="guardarregistro">
+                        <form id="frmProducto" @reset.prevent.default="nuevoProduto" @submit.prevent.default="guardarProducto">
                             <div class="row p-1">
-                                <div class="col col-md-2">MATERIA</div>
+                                <div class="col col-md-2">materia</div>
                                 <div class="col col-md-8">
-                                    <v-select-materia required v-model="registro.materia" 
+                                    <v-select-materia required v-model="inscripcion.materia" 
                                         :options="materias">Por favor seleccione una materia</v-select-materia>
                                 </div>
                             </div>
                             <div class="row p-1">
                                 <div class="col col-md-2">CODIGO</div>
                                 <div class="col col-md-5">
-                                    <input v-model="registro.codigo" required pattern="[0-9]{2,25}" type="text" class="form-control">
+                                    <input v-model="inscripcion.codigo" required pattern="[0-9]{2,25}" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="row p-1">
                                 <div class="col col-md-2">NOMBRE</div>
                                 <div class="col col-md-10">
-                                    <input v-model="registro.nombre" required pattern="^[a-zA-ZáíéóúñÑ]{3,50}([a-zA-ZáíéóúñÑ ]{1,50})$" type="text" class="form-control">
+                                    <input v-model="inscripcion.nombre" required pattern="^[a-zA-ZáíéóúñÑ]{3,50}([a-zA-ZáíéóúñÑ ]{1,50})$" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="row p-1">
-                                <div class="col col-md-2">SEDE</div>
+                                <div class="col col-md-2">MARCA</div>
                                 <div class="col col-md-8">
-                                    <input v-model="registro.sede" required pattern="^[a-zA-ZáíéóúñÑ]{3,50}([a-zA-ZáíéóúñÑ ]{1,50})$" type="text" class="form-control">
+                                    <input v-model="inscripcion.marca" required pattern="^[a-zA-ZáíéóúñÑ]{3,50}([a-zA-ZáíéóúñÑ ]{1,50})$" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="row p-1">
-                                <div class="col col-md-2">Modalidad</div>
+                                <div class="col col-md-2">MODALIDAD</div>
                                 <div class="col col-md-10">
-                                    <input v-model="registro.modalidad" required pattern="^[a-zA-Z0-9áíéóúñÑ]{1,50}([a-zA-Z0-9áíéóúñÑ. ]{2,50})$" type="text" class="form-control">
+                                    <input v-model="inscripcion.modalidad" required pattern="^[a-zA-Z0-9áíéóúñÑ]{1,50}([a-zA-Z0-9áíéóúñÑ. ]{2,50})$" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="row p-1">
-                                <div class="col col-md-2">PRECIO</div>
+                                <div class="col col-md-2">CUOTA</div>
                                 <div class="col col-md-3">
-                                    <input v-model="registro.precio" required type="number" step="0.01" class="form-control">
+                                    <input v-model="inscripcion.cuota" required type="number" step="0.01" class="form-control">
                                 </div>
                             </div>
                             <div class="row p-1">
                                 <div class="col col-md-2">
-                                    <img :src="registro.foto" width="50"/>
+                                    <img :src="inscripcion.foto" width="50"/>
                                 </div>
                                 <div class="col col-md-8">
                                     <div class="mb-3">
@@ -182,38 +182,38 @@ Vue.component('componente-registros', {
             </div>
             <div class="col col-md-7">
                 <div class="card text-bg-dark">
-                    <div class="card-header">LISTADO DE MATRICULAS</div>
+                    <div class="card-header">LISTADO DE inscripciones</div>
                     <div class="card-body">
-                        <form id="frmregistro">
+                        <form id="frmProducto">
                             <table class="table table-dark table-hover">
                                 <thead>
                                     <tr>
                                         <th>BUSCAR</th>
                                         <th colspan="7">
-                                            <input placeholder="codigo, nombre, sede, modalidad" type="search" v-model="valor" @keyup="buscarregistro" class="form-control">
+                                            <input placeholder="codigo, nombre, marca, modalidad" type="search" v-model="valor" @keyup="buscarProducto" class="form-control">
                                         </th>
                                     </tr>
                                     <tr>
                                         <th>materia</th>
                                         <th>CODIGO</th>
                                         <th>NOMBRE</th>
-                                        <th>SEDE</th>
+                                        <th>MARCA</th>
                                         <th>MODALIDAD</th>
-                                        <th>PRECIO</th>
+                                        <th>CUOTA</th>
                                         <th></th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr @click="modificarregistro(registro)" v-for="registro in registros" :key="registro.idregistro">
-                                        <td>{{registro.materia.label}}</td>
-                                        <td>{{registro.codigo}}</td>
-                                        <td>{{registro.nombre}}</td>
-                                        <td>{{registro.sede}}</td>
-                                        <td>{{registro.modalidad}}</td>
-                                        <td>{{registro.precio}}</td>
-                                        <td><img :src="registro.foto" width="50"/></td>
-                                        <td><button @click.prevent.default="eliminarregistro(registro.idregistro)" class="btn btn-danger">del</button></td>
+                                    <tr @click="modificarProducto(inscripcion)" v-for="inscripcion in inscripciones" :key="inscripcion.idProducto">
+                                        <td>{{inscripcion.materia.label}}</td>
+                                        <td>{{inscripcion.codigo}}</td>
+                                        <td>{{inscripcion.nombre}}</td>
+                                        <td>{{inscripcion.marca}}</td>
+                                        <td>{{inscripcion.modalidad}}</td>
+                                        <td>{{inscripcion.cuota}}</td>
+                                        <td><img :src="inscripcion.foto" width="50"/></td>
+                                        <td><button @click.prevent.default="eliminarProducto(inscripcion.idProducto)" class="btn btn-danger">del</button></td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -3,7 +3,7 @@ const funcdb = ()=>{
     db = new Dexie("db_sistema");
     db.version(1).stores({
         materias:'idmateria,codigo,nombre',
-        registros:'idregistro,codigo,nombre,sede,modalidad'
+        inscripciones:'idProducto,codigo,nombre,marca,modalidad'
       });
 };
 funcdb();

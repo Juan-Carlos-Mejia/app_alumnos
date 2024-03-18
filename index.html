@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App de registros</title>
+    <title>App de inscripciones</title>
     <link rel="stylesheet" href="	https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://unpkg.com/vue-select@3.0.0/dist/vue-select.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.min.css">
@@ -12,22 +12,22 @@
     <div class="container-fluid" id="app">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-                <a class="navbar-brand">::.. SISTEMA DE ALUMNOS ..::</a>
+                <a class="navbar-brand">::.. SISTEMA DE FACTURACION ..::</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav">
-                        <a class="nav-link" @click="abrirFormulario('materia')">MATERIA</a>
-                        <a class="nav-link" @click="abrirFormulario('registro')">REGISTRO</a>
-                        <a class="nav-link" @click="abrirFormulario('alumno')">ALUMNO</a>
+                        <a class="nav-link" @click="abrirFormulario('materia')">materia</a>
+                        <a class="nav-link" @click="abrirFormulario('inscripcion')">inscripciones</a>
+                        <a class="nav-link" @click="abrirFormulario('alumno')">alumno</a>
                     </div>
                 </div>
             </div>
         </nav>
         <div id="appSistema">
             <componente-materias ref="materia" v-show="forms['materia'].mostrar"></componente-materias>
-            <componente-registros ref="registro" v-show="forms['registro'].mostrar"></componente-registros>
+            <componente-inscripciones ref="inscripcion" v-show="forms['inscripcion'].mostrar"></componente-inscripciones>
             <componente-alumnos ref="alumno" v-show="forms['alumno'].mostrar"></componente-alumnos>
         </div>
     </div>
@@ -38,7 +38,7 @@
     <script src="db.js"></script>
     <script src="imagenes.js"></script>
     <script src="materias.js"></script>
-    <script src="registros.js"></script>
+    <script src="inscripciones.js"></script>
     <script src="alumnos.js"></script>
     <script src="main.js"></script>
 </body>
