@@ -19,13 +19,13 @@ Vue.component('componente-alumnos', {
             this.listar();
         },
         eliminaralumno(idalumno){
-            if( confirm(`Esta seguro de elimina el alumno?`) ){
-                let store = abrirStore('alumnos', 'readwrite'),
-                query = store.delete(idalumno);
-            query.onsuccess = e=>{
+            if( confirm(`Esta seguro de elimina el materia?`) ){
+                this.accion='eliminar';
+                await db.alumnos.where("idmateria").equals(idmateria).delete();
+                let respuesta = await fetch(`private/modulos/alumnos/alumnos.php?accion=eliminar&alumnos=${JSON.stringify(this.alumno)}`),
+                    data = await respuesta.json();
                 this.nuevoalumno();
                 this.listar();
-            };
             }
         },
         modificaralumno(alumno){
@@ -33,16 +33,11 @@ Vue.component('componente-alumnos', {
             this.alumno = alumno;
         },
         guardaralumno(){
-            //almacenamiento del objeto alumnos en indexedDB
-            let store = abrirStore('alumnos', 'readwrite'),
-                query = store.put({...this.alumno});
-            query.onsuccess = e=>{
-                this.nuevoalumno();
-                this.listar();
-            };
-            query.onerror = e=>{
-                console.error('Error al guardar en alumnos', e.message());
-            };
+            await db.alumnos.bulkPut([{...this.alumno}]);
+            let respuesta = await fetch(`private/modulos/alumnos/alumnos.php?accion=${this.accion}&alumnos=${JSON.stringify(this.alumno)}`),
+                data = await respuesta.json();
+            this.nuevoalumno();
+            this.listar();
         },
         nuevoalumno(){
             this.accion = 'nuevo';
@@ -56,16 +51,19 @@ Vue.component('componente-alumnos', {
             }
         },
         listar(){
-            let store = abrirStore('alumnos', 'readonly'),
-                data = store.getAll();
-            data.onsuccess = resp=>{
-                this.alumnos = data.result
-                    .filter(alumno=>alumno.codigo.includes(this.valor) || 
-                    alumno.nombre.toLowerCase().includes(this.valor.toLowerCase()) || 
-                    alumno.direccion.toLowerCase().includes(this.valor.toLowerCase()) || 
-                    alumno.telefono.toLowerCase().includes(this.valor.toLowerCase()) ||
-                    alumno.email.toLowerCase().includes(this.valor.toLowerCase()));
-            };
+            let collections = db.alumnos.orderBy('codigo')
+            .filter(alumno=>alumno.codigo.includes(this.valor) ||
+                alumno.nombre.toLowerCase().includes(this.valor.toLowerCase()) ||
+                alumno.direccion.toLowerCase().includes(this.valor.toLowerCase()) ||
+                alumno.telefono.toLowerCase().includes(this.valor.toLowerCase()) ||
+                alumno.email.toLowerCase().includes(this.valor.toLowerCase()));
+            this.alumno = await collections.toArray();
+            if( this.alumnos.length<=0 ){
+                let respuesta = await fetch('private/modulos/alumnos/alumnos.php?accion=consultar'),
+                    data = await respuesta.json();
+                this.alumnos = data;
+                db.alumnos.bulkPut(data);
+            }
         }
     },
     template: `
