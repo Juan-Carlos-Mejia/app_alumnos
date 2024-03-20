@@ -5,42 +5,42 @@ Vue.component('componente-materias', {
             materias:[],
             accion:'nuevo',
             materia:{
-                idmateria: new Date().getTime(),
+                idMateria: new Date().getTime(),
                 codigo:'',
                 nombre:'',
             }
         }
     },
     methods:{
-        buscarmateria(e){
+        buscarMateria(e){
             this.listar();
         },
-        async eliminarmateria(idmateria){
-            if( confirm(`Esta seguro de elimina el materia?`) ){
+        async eliminarMateria(idMateria){
+            if( confirm(`¿Estás seguro de eliminar la materia?`) ){
                 this.accion='eliminar';
-                await db.materias.where("idmateria").equals(idmateria).delete();
+                await db.materias.where("idMateria").equals(idMateria).delete();
                 let respuesta = await fetch(`private/modulos/materias/materias.php?accion=eliminar&materias=${JSON.stringify(this.materia)}`),
                     data = await respuesta.json();
-                this.nuevomateria();
+                this.nuevaMateria();
                 this.listar();
             }
         },
-        modificarmateria(materia){
+        modificarMateria(materia){
             this.accion = 'modificar';
             this.materia = materia;
         },
-        async guardarmateria(){
-            //almacenamiento del objeto materias en indexedDB
+        async guardarMateria(){
+            // Almacenamiento del objeto materia en indexedDB
             await db.materias.bulkPut([{...this.materia}]);
             let respuesta = await fetch(`private/modulos/materias/materias.php?accion=${this.accion}&materias=${JSON.stringify(this.materia)}`),
                 data = await respuesta.json();
-            this.nuevomateria();
+            this.nuevaMateria();
             this.listar();
         },
-        nuevomateria(){
+        nuevaMateria(){
             this.accion = 'nuevo';
             this.materia = {
-                idmateria: new Date().getTime(),
+                idMateria: new Date().getTime(),
                 codigo:'',
                 nombre:'',
             }
@@ -62,7 +62,7 @@ Vue.component('componente-materias', {
         <div class="row">
             <div class="col col-md-6">
                 <div class="card text-bg-dark">
-                    <div class="card-header">REGISTRO DE materiaS</div>
+                    <div class="card-header">REGISTRO DE MATERIAS</div>
                     <div class="catd-body">
                         <div class="row p-1">
                             <div class="col col-md-2">CODIGO</div>
@@ -78,8 +78,8 @@ Vue.component('componente-materias', {
                         </div>
                         <div class="row p-1">
                             <div class="col">
-                                <button @click.prevent.default="guardarmateria" class="btn btn-success">GUARDAR</button>
-                                <button @click.prevent.default="nuevomateria" class="btn btn-warning">NUEVO</button>
+                                <button @click.prevent.default="guardarMateria" class="btn btn-success">GUARDAR</button>
+                                <button @click.prevent.default="nuevaMateria" class="btn btn-warning">NUEVO</button>
                             </div>
                         </div>
                     </div>
@@ -87,15 +87,15 @@ Vue.component('componente-materias', {
             </div>
             <div class="col col-md-6">
                 <div class="card text-bg-dark">
-                    <div class="card-header">LISTADO DE materiaS</div>
+                    <div class="card-header">LISTADO DE MATERIAS</div>
                     <div class="card-body">
-                        <form id="frmmateria">
+                        <form id="frmMateria">
                             <table class="table table-dark table-hover">
                                 <thead>
                                     <tr>
                                         <th>BUSCAR</th>
                                         <th colspan="5">
-                                            <input placeholder="codigo, nombre" type="search" v-model="valor" @keyup="buscarmateria" class="form-control">
+                                            <input placeholder="codigo, nombre" type="search" v-model="valor" @keyup="buscarMateria" class="form-control">
                                         </th>
                                     </tr>
                                     <tr>
@@ -105,10 +105,10 @@ Vue.component('componente-materias', {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr @click="modificarmateria(materia)" v-for="materia in materias" :key="materia.idmateria">
+                                    <tr @click="modificarMateria(materia)" v-for="materia in materias" :key="materia.idMateria">
                                         <td>{{materia.codigo}}</td>
                                         <td>{{materia.nombre}}</td>
-                                        <td><button @click.prevent.default="eliminarmateria(materia.idmateria)" class="btn btn-danger">del</button></td>
+                                        <td><button @click.prevent.default="eliminarMateria(materia.idMateria)" class="btn btn-danger">del</button></td>
                                     </tr>
                                 </tbody>
                             </table>

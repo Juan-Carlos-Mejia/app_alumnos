@@ -11,35 +11,33 @@ Vue.component('componente-inscripciones', {
                     id:'',
                     label:''
                 },
-                idProducto: new Date().getTime(),
+                idInscripcion: new Date().getTime(),
                 codigo:'',
                 nombre:'',
                 marca:'',
-                modalidad:'',
-                cuota:0.0,
-                foto:'',
+                presentacion:'',
+                precio:0.0,
             }
         }
     },
     methods:{
-        buscarProducto(e){
+        buscarInscripcion(e){
             this.listar();
         },
-        async eliminarProducto(idProducto){
+        async eliminarInscripcion(idInscripcion){
             if( confirm(`Esta seguro de elimina el inscripcion?`) ){
-                await db.inscripciones.where("idProducto").equals(idProducto).delete();
-                this.inscripcion.foto = '';
+                await db.inscripciones.where("idInscripcion").equals(idInscripcion).delete();
                 let respuesta = await fetch(`private/modulos/inscripciones/inscripciones.php?accion=eliminar&inscripciones=${JSON.stringify(this.inscripcion)}`),
                     data = await respuesta.json();
-                this.nuevoProducto();
+                this.nuevoInscripcion();
                 this.listar();
             }
         },
-        modificarProducto(inscripcion){
+        modificarInscripcion(inscripcion){
             this.accion = 'modificar';
             this.inscripcion = inscripcion;
         },
-        async guardarProducto(){
+        async guardarInscripcion(){
             //almacenamiento del objeto inscripciones en indexedDB
             if( this.inscripcion.materia.id=='' ||
                 this.inscripcion.materia.label=='' ){
@@ -49,7 +47,7 @@ Vue.component('componente-inscripciones', {
             await db.inscripciones.bulkPut([{...this.inscripcion}]);
             let respuesta = await fetch(`private/modulos/inscripciones/inscripciones.php?accion=${this.accion}&inscripciones=${JSON.stringify(this.inscripcion)}`),
                 data = await respuesta.json();
-            this.nuevoProducto();
+            this.nuevoInscripcion();
             this.listar();
             
             /*query.onerror = e=>{
@@ -61,19 +59,16 @@ Vue.component('componente-inscripciones', {
                 alertify.error(`Error al guardar en inscripciones, ${e.target.error.message}`);
             };*/
         },
-        nuevoProducto(){
+        nuevoInscripcion(){
             this.accion = 'nuevo';
             this.inscripcion = {
                 materia:{
                     id:'',
                     label:''
                 },
-                idProducto: new Date().getTime(),
+                idInscripcion: new Date().getTime(),
                 codigo:'',
-                nombre:'',
-                marca:'',
-                modalidad:'',
-                cuota:0.0
+                alumno:''
             }
         },
         async listar(){
@@ -81,15 +76,13 @@ Vue.component('componente-inscripciones', {
             this.materias = await collections.toArray();
             this.materias = this.materias.map(materia=>{
                 return {
-                    id: materia.idmateria,
+                    id: materia.idMateria,
                     label:materia.nombre
                 }
             });
             let collection = db.inscripciones.orderBy('codigo').filter(
                 inscripcion=>inscripcion.codigo.includes(this.valor) || 
-                    inscripcion.nombre.toLowerCase().includes(this.valor.toLowerCase()) || 
-                    inscripcion.marca.toLowerCase().includes(this.valor.toLowerCase()) || 
-                    inscripcion.modalidad.toLowerCase().includes(this.valor.toLowerCase())
+                    inscripcion.alumno.toLowerCase().includes(this.valor.toLowerCase())
             );
             this.inscripciones = await collection.toArray();
             if( this.inscripciones.length<=0 ){
@@ -98,16 +91,12 @@ Vue.component('componente-inscripciones', {
                 this.inscripciones = data.map(inscripcion=>{
                     return {
                         materia:{
-                            id:inscripcion.idmateria,
+                            id:inscripcion.idMateria,
                             label:inscripcion.nomcat
                         }, 
-                        idProducto : inscripcion.idProducto,
+                        idInscripcion : inscripcion.idInscripcion,
                         codigo: inscripcion.codigo,
-                        nombre: inscripcion.nombre,
-                        marca: inscripcion.marca,
-                        modalidad: inscripcion.modalidad,
-                        cuota: inscripcion.cuota,
-                        foto:inscripcion.foto.split(' ').join('+')
+                        alumno: inscripcion.alumno,
                     }
                 });
                 db.inscripciones.bulkPut(this.inscripciones);
@@ -118,11 +107,11 @@ Vue.component('componente-inscripciones', {
         <div class="row">
             <div class="col col-md-5">
                 <div class="card">
-                    <div class="card-header text-bg-dark">REGISTRO DE inscripciones</div>
+                    <div class="card-header text-bg-dark">REGISTRO DE INSCRIPCIONES</div>
                     <div class="catd-body">
-                        <form id="frmProducto" @reset.prevent.default="nuevoProduto" @submit.prevent.default="guardarProducto">
+                        <form id="frmInscripcion" @reset.prevent.default="nuevoProduto" @submit.prevent.default="guardarInscripcion">
                             <div class="row p-1">
-                                <div class="col col-md-2">materia</div>
+                                <div class="col col-md-2">MATERIA</div>
                                 <div class="col col-md-8">
                                     <v-select-materia required v-model="inscripcion.materia" 
                                         :options="materias">Por favor seleccione una materia</v-select-materia>
@@ -135,39 +124,9 @@ Vue.component('componente-inscripciones', {
                                 </div>
                             </div>
                             <div class="row p-1">
-                                <div class="col col-md-2">NOMBRE</div>
+                                <div class="col col-md-2">ALUMNO</div>
                                 <div class="col col-md-10">
-                                    <input v-model="inscripcion.nombre" required pattern="^[a-zA-ZáíéóúñÑ]{3,50}([a-zA-ZáíéóúñÑ ]{1,50})$" type="text" class="form-control">
-                                </div>
-                            </div>
-                            <div class="row p-1">
-                                <div class="col col-md-2">MARCA</div>
-                                <div class="col col-md-8">
-                                    <input v-model="inscripcion.marca" required pattern="^[a-zA-ZáíéóúñÑ]{3,50}([a-zA-ZáíéóúñÑ ]{1,50})$" type="text" class="form-control">
-                                </div>
-                            </div>
-                            <div class="row p-1">
-                                <div class="col col-md-2">MODALIDAD</div>
-                                <div class="col col-md-10">
-                                    <input v-model="inscripcion.modalidad" required pattern="^[a-zA-Z0-9áíéóúñÑ]{1,50}([a-zA-Z0-9áíéóúñÑ. ]{2,50})$" type="text" class="form-control">
-                                </div>
-                            </div>
-                            <div class="row p-1">
-                                <div class="col col-md-2">CUOTA</div>
-                                <div class="col col-md-3">
-                                    <input v-model="inscripcion.cuota" required type="number" step="0.01" class="form-control">
-                                </div>
-                            </div>
-                            <div class="row p-1">
-                                <div class="col col-md-2">
-                                    <img :src="inscripcion.foto" width="50"/>
-                                </div>
-                                <div class="col col-md-8">
-                                    <div class="mb-3">
-                                        <label for="formFile" class="form-label">Seleccione la foto</label>
-                                        <input class="form-control" type="file" id="formFile" required 
-                                            accept="image/*" onChange="seleccionarFoto(this)">
-                                    </div>
+                                    <input v-model="inscripcion.alumno" required pattern="^[a-zA-ZáíéóúñÑ]{3,50}([a-zA-ZáíéóúñÑ ]{1,50})$" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="row p-1">
@@ -182,38 +141,30 @@ Vue.component('componente-inscripciones', {
             </div>
             <div class="col col-md-7">
                 <div class="card text-bg-dark">
-                    <div class="card-header">LISTADO DE inscripciones</div>
+                    <div class="card-header">LISTADO DE INSCRIPCIONES</div>
                     <div class="card-body">
-                        <form id="frmProducto">
+                        <form id="frmInscripcion">
                             <table class="table table-dark table-hover">
                                 <thead>
                                     <tr>
                                         <th>BUSCAR</th>
                                         <th colspan="7">
-                                            <input placeholder="codigo, nombre, marca, modalidad" type="search" v-model="valor" @keyup="buscarProducto" class="form-control">
+                                            <input placeholder="" type="search" v-model="valor" @keyup="buscarInscripcion" class="form-control">
                                         </th>
                                     </tr>
                                     <tr>
-                                        <th>materia</th>
+                                        <th>MATERIA</th>
                                         <th>CODIGO</th>
-                                        <th>NOMBRE</th>
-                                        <th>MARCA</th>
-                                        <th>MODALIDAD</th>
-                                        <th>CUOTA</th>
-                                        <th></th>
+                                        <th>ALUMNO</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr @click="modificarProducto(inscripcion)" v-for="inscripcion in inscripciones" :key="inscripcion.idProducto">
+                                    <tr @click="modificarInscripcion(inscripcion)" v-for="inscripcion in inscripciones" :key="inscripcion.idInscripcion">
                                         <td>{{inscripcion.materia.label}}</td>
                                         <td>{{inscripcion.codigo}}</td>
-                                        <td>{{inscripcion.nombre}}</td>
-                                        <td>{{inscripcion.marca}}</td>
-                                        <td>{{inscripcion.modalidad}}</td>
-                                        <td>{{inscripcion.cuota}}</td>
-                                        <td><img :src="inscripcion.foto" width="50"/></td>
-                                        <td><button @click.prevent.default="eliminarProducto(inscripcion.idProducto)" class="btn btn-danger">del</button></td>
+                                        <td>{{inscripcion.alumno}}</td>
+                                        <td><button @click.prevent.default="eliminarInscripcion(inscripcion.idInscripcion)" class="btn btn-danger">del</button></td>
                                     </tr>
                                 </tbody>
                             </table>

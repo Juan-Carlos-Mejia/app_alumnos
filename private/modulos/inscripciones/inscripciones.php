@@ -4,8 +4,8 @@ extract($_REQUEST);
 
 $inscripciones = isset($inscripciones) ? $inscripciones : '[]';
 $accion=$accion ?? '';
-$class_productos = new inscripciones($conexion);
-print_r( json_encode($class_productos->recibir_datos($inscripciones)) );
+$class_inscripciones = new inscripciones($conexion);
+print_r( json_encode($class_inscripciones->recibir_datos($inscripciones)) );
 
 class inscripciones{
     private $datos=[], $db, $respuesta = ['msg'=>'ok'];
@@ -15,56 +15,43 @@ class inscripciones{
     public function recibir_datos($inscripciones){
         global $accion;
         if($accion==='consultar'){
-            return $this->administrar_productos();
+            return $this->administrar_inscripciones();
         }else{
             $this->datos = json_decode($inscripciones, true);
             return $this->validar_datos();
         }
     }
     private function validar_datos(){
-        if( empty($this->datos['idProducto']) ){
+        if( empty($this->datos['idInscripcion']) ){
             $this->respuesta['msg'] = 'Por error no se pudo seleccionar la ID';
         }
         if( empty($this->datos['materia']['id']) ){
-            $this->respuesta['msg'] = 'Por error no se pudo seleccionar la materia';
+            $this->respuesta['msg'] = 'Por error no se pudo seleccionar la Categoria';
         }
         if( empty($this->datos['codigo']) ){
-            $this->respuesta['msg'] = 'Por favor ingrese el codigo del inscripcion';
+            $this->respuesta['msg'] = 'Por favor ingrese el codigo del producto';
         }
-        if( empty($this->datos['nombre']) ){
-            $this->respuesta['msg'] = 'Por favor ingrese el nombre del inscripcion';
+        if( empty($this->datos['alumno']) ){
+            $this->respuesta['msg'] = 'Por favor ingrese el nombre del producto';
         }
-        if( empty($this->datos['marca']) ){
-            $this->respuesta['msg'] = 'Por favor ingrese la marca del inscripcion';
-        }
-        if( empty($this->datos['modalidad']) ){
-            $this->respuesta['msg'] = 'Por favor ingrese la modalidad del inscripcion';
-        }
-        if( empty($this->datos['cuota']) ){
-            $this->respuesta['msg'] = 'Por favor ingrese el cuota del inscripcion';
-        }
-        return $this->administrar_productos();
+        return $this->administrar_inscripciones();
     }
-    private function administrar_productos(){
+    private function administrar_inscripciones(){
         global $accion;
         if( $this->respuesta['msg'] === 'ok' ){
             if( $accion==='nuevo' ){
-                return $this->db->consultas('INSERT INTO inscripciones VALUES(?,?,?,?,?,?,?,?)',
-                $this->datos['idProducto'],$this->datos['materia']['id'],$this->datos['codigo'],
-                    $this->datos['nombre'],$this->datos['marca'],$this->datos['modalidad'],$this->datos['cuota'],$this->datos['foto']);
+                return $this->db->consultas('INSERT INTO inscripciones VALUES(?,?,?,?)',
+                $this->datos['idInscripcion'],$this->datos['materia']['id'],$this->datos['codigo'],
+                    $this->datos['alumno']);
             }else if($accion==='modificar' ){
-                return $this->db->consultas('UPDATE inscripciones SET idmateria=?, codigo=?, nombre=?, marca=?, modalidad=?, cuota=?, foto=? WHERE idProducto=?',
-                $this->datos['materia']['id'], $this->datos['codigo'],$this->datos['nombre'], $this->datos['marca'], $this->datos['modalidad'], 
-                $this->datos['cuota'], $this->datos['foto'], $this->datos['idProducto']);
+                return $this->db->consultas('UPDATE inscripciones SET idMateria=?, codigo=?, alumno=? WHERE idInscripcion=?',
+                $this->datos['materia']['id'], $this->datos['codigo'],$this->datos['alumno'], $this->datos['idInscripcion']);
             }else if($accion==='eliminar'){
-                return $this->db->consultas('DELETE inscripciones FROM inscripciones WHERE idProducto=?',
-                $this->datos['idProducto']);
+                return $this->db->consultas('DELETE inscripciones FROM inscripciones WHERE idInscripcion=?',
+                $this->datos['idInscripcion']);
             }else if($accion==='consultar'){
                 $this->db->consultas('
-                    SELECT inscripciones.idProducto, inscripciones.idmateria, inscripciones.codigo, inscripciones.nombre, 
-                        inscripciones.marca, inscripciones.modalidad, inscripciones.cuota, inscripciones.foto, materias.nombre AS nomcat
-                    FROM inscripciones
-                        INNER JOIN materias ON (inscripciones.idmateria = materias.idmateria)
+                    SELECT inscripciones.idInscripcion, inscripciones.idMateria, inscripciones.codigo, inscripciones.alumno, materias.nombre AS nomcat FROM inscripciones INNER JOIN materias ON (inscripciones.idMateria = materias.idMateria)
                 ');
                 return $this->db->obtener_datos();
             }
